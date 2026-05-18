@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Krona+One&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Krona One', sans-serif;
+
+  --color-neon-cyan: #00f5ff;
+  --color-neon-purple: #bd00ff;
+  --color-neon-pink: #ff007f;
+  
+  --color-fc-lime: #ccff00;
+  --color-fc-gold: #d1a850;
+  --color-fc-dark: #090a0f;
+  --color-fc-card: rgba(18, 20, 28, 0.8);
+  --color-fc-border: rgba(204, 255, 0, 0.15);
+}
+
+/* Global Reset and EA Sports FC Theme styling */
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background-color: #090a0f;
+  color: #e2e8f0;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090a0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(204, 255, 0, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-fc-lime);
+  box-shadow: 0 0 10px var(--color-fc-lime);
+}
+
+/* Sports Carbon Grids and Slanted EA FC Themes */
+.fc-grid-bg {
+  background-color: #090a0f;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.fc-slanted-bg {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(204, 255, 0, 0.02) 0px,
+    rgba(204, 255, 0, 0.02) 2px,
+    transparent 2px,
+    transparent 15px
+  );
+}
+
+.fc-glass-card {
+  background: rgba(18, 20, 28, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(204, 255, 0, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+.fc-glass-card-hover:hover {
+  border-color: var(--color-fc-lime);
+  box-shadow: 0 0 25px rgba(204, 255, 0, 0.15);
+  background: rgba(22, 24, 34, 0.95);
+  transform: translateY(-4px);
+}
+
+/* EA Sports FC Slanted Title look */
+.fc-title-slanted {
+  font-family: var(--font-display);
+  transform: skewX(-6deg);
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+}
+
+/* Neon soccer pitch details */
+.soccer-pitch {
+  background: radial-gradient(circle at center, #1b3820 0%, #0d1e10 100%);
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Glowing Neon Text and Borders */
+.text-glow-lime {
+  text-shadow: 0 0 10px rgba(204, 255, 0, 0.6), 0 0 20px rgba(204, 255, 0, 0.3);
+}
+
+.border-glow-lime:hover {
+  box-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
+  border-color: var(--color-fc-lime);
+}
+
+/* Camera Shake Jitter classes */
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  10% { transform: translate(-3px, 2px) rotate(-1deg); }
+  20% { transform: translate(2px, -3px) rotate(1deg); }
+  30% { transform: translate(-2px, -2px) rotate(0deg); }
+  40% { transform: translate(3px, 2px) rotate(1deg); }
+  50% { transform: translate(-1px, -1px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  75% { transform: translate(2px, -2px) rotate(1deg); }
+  90% { transform: translate(-1px, 2px) rotate(0deg); }
+}
+
+.camera-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* FUT Card Shape Clip Paths */
+.fut-card-clip {
+  clip-path: polygon(10% 0%, 90% 0%, 100% 8%, 100% 85%, 85% 100%, 15% 100%, 0% 92%, 0% 8%);
+}
+
+.fut-card-inner-clip {
+  clip-path: polygon(9% 1%, 91% 1%, 99% 9%, 99% 84%, 84% 99%, 16% 99%, 1% 91%, 1% 9%);
+}
+
+/* Loading animations */
+@keyframes pulseLime {
+  0%, 100% {
+    opacity: 0.4;
+    box-shadow: 0 0 10px rgba(204, 255, 0, 0.2);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 25px rgba(204, 255, 0, 0.5);
+  }
+}
+
+.lime-glow-pulse {
+  animation: pulseLime 2s infinite ease-in-out;
+}
