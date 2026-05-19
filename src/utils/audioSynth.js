@@ -2,8 +2,30 @@
 // Ensures 100% offline functionality with zero external audio assets
 
 let audioCtx = null;
+let muted = false;
+
+// Initialize mute state from localStorage
+try {
+  muted = localStorage.getItem("sound_muted") === "true";
+} catch (e) {}
+
+export function isMuted() {
+  return muted;
+}
+
+export function toggleMute() {
+  muted = !muted;
+  try {
+    localStorage.setItem("sound_muted", muted ? "true" : "false");
+  } catch (e) {}
+  if (muted) {
+    stopPackOpeningLoop();
+  }
+  return muted;
+}
 
 function initAudio() {
+  if (muted) return null;
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
@@ -15,8 +37,10 @@ function initAudio() {
 
 // 1. Synthesize a professional double referee whistle blast
 export function playWhistle() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
     const playBlast = (startTime, duration) => {
@@ -52,18 +76,19 @@ export function playWhistle() {
     playBlast(now, 0.15);
     playBlast(now + 0.22, 0.45);
   } catch (error) {
-    console.warn("Failed to synthesize whistle sound:", error);
+    console.warn("Failed to play whistle:", error);
   }
 }
 
 // 2. Synthesize massive stadium crowd cheering roar WITH RHYTHMIC low-pass "GOAT! GOAT!" CHANTS
 export function playCrowdGoal() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
-    const duration = 6.0; // Long 6 seconds roar
+    const duration = 6.0;
 
-    // A. GENERAL CROWD AMBIENT ROAR (high-fidelity filtered white noise)
     const bufferSize = ctx.sampleRate * duration;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -78,12 +103,12 @@ export function playCrowdGoal() {
     filter.type = "bandpass";
     filter.Q.setValueAtTime(1.5, now);
     filter.frequency.setValueAtTime(260, now);
-    filter.frequency.exponentialRampToValueAtTime(1200, now + 0.45); // Ecstatic scream peak
+    filter.frequency.exponentialRampToValueAtTime(1200, now + 0.45); 
     filter.frequency.exponentialRampToValueAtTime(320, now + duration);
 
     const gainNode = ctx.createGain();
     gainNode.gain.setValueAtTime(0.001, now);
-    gainNode.gain.linearRampToValueAtTime(0.85, now + 0.35); // Loud fast rise
+    gainNode.gain.linearRampToValueAtTime(0.85, now + 0.35); 
     gainNode.gain.exponentialRampToValueAtTime(0.4, now + 1.5); 
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration); 
 
@@ -93,36 +118,28 @@ export function playCrowdGoal() {
     noiseSource.start(now);
     noiseSource.stop(now + duration);
 
-    // B. RHYTHMIC CHORAL CROWD CHANTING "GOAT! GOAT! GOAT!" (50,000 fan spatial chorus)
     const chantTimes = [0.4, 1.2, 2.0, 2.8, 3.6]; 
     chantTimes.forEach((time) => {
       const chantGain = ctx.createGain();
       const oscs = [];
-      
-      // 6 detuned vocal sawtooth oscillators for a huge choral weight
       const frequencies = [140, 160, 200, 240, 270, 310]; 
       frequencies.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         osc.type = "sawtooth";
-        
-        // Add tiny detune and phase offsets for chorus width
         const detuneAmt = (idx - 2.5) * 5; 
         osc.frequency.setValueAtTime(freq + detuneAmt, now + time);
-        
-        // Downward frequency slide representing huge group vocal slide
         osc.frequency.linearRampToValueAtTime(freq + detuneAmt - 40, now + time + 0.45);
         osc.connect(chantGain);
         oscs.push(osc);
       });
 
-      // Bandpass filtered to mimic acoustic reflections of massive stadium stands
       const chantFilter = ctx.createBiquadFilter();
       chantFilter.type = "lowpass";
       chantFilter.frequency.setValueAtTime(520, now + time);
 
       chantGain.gain.setValueAtTime(0, now + time);
-      chantGain.gain.linearRampToValueAtTime(0.7, now + time + 0.06); // sharp vocal shout
-      chantGain.gain.exponentialRampToValueAtTime(0.001, now + time + 0.45); // decay
+      chantGain.gain.linearRampToValueAtTime(0.7, now + time + 0.06); 
+      chantGain.gain.exponentialRampToValueAtTime(0.001, now + time + 0.45); 
 
       chantGain.connect(chantFilter);
       chantFilter.connect(ctx.destination);
@@ -133,22 +150,22 @@ export function playCrowdGoal() {
       });
     });
   } catch (error) {
-    console.warn("Failed to synthesize crowd chanting roar:", error);
+    console.warn("Failed to play crowd goal:", error);
   }
 }
 
 // 3. Synthesize a massive sub-bass BOOM, pyrotechnic crackles, and stadium air horns
 export function playExplosionSound() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
     
-    // A. DEEP COARSE PHYSICAL SUB-BASS SWEEP
     const subOsc = ctx.createOscillator();
     const subGain = ctx.createGain();
     subOsc.type = "triangle";
     subOsc.frequency.setValueAtTime(150, now);
-    // Sweeps all the way down into physical infrasound rumble (10Hz)
     subOsc.frequency.exponentialRampToValueAtTime(10, now + 1.8);
     
     subGain.gain.setValueAtTime(0.95, now);
@@ -159,7 +176,6 @@ export function playExplosionSound() {
     subOsc.start(now);
     subOsc.stop(now + 1.8);
 
-    // B. PYRO LAUNCHER & HEAVY WHITE NOISE BOOM
     const bufferSize = ctx.sampleRate * 2.2;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -173,7 +189,7 @@ export function playExplosionSound() {
     noiseFilter.type = "lowpass";
     noiseFilter.frequency.setValueAtTime(1200, now);
     noiseFilter.frequency.exponentialRampToValueAtTime(50, now + 1.4);
-    noiseFilter.Q.setValueAtTime(8.5, now); // Highly resonant, chest-punchy bass
+    noiseFilter.Q.setValueAtTime(8.5, now); 
 
     const noiseGain = ctx.createGain();
     noiseGain.gain.setValueAtTime(0.9, now);
@@ -186,7 +202,6 @@ export function playExplosionSound() {
     noise.start(now);
     noise.stop(now + 2.2);
 
-    // C. ENERGETIC STADIUM DUAL-TONE AIR HORNS (Ba-Ba-Baaaa!)
     const playAirHorn = (time, duration) => {
       const osc1 = ctx.createOscillator();
       const osc2 = ctx.createOscillator();
@@ -196,27 +211,24 @@ export function playExplosionSound() {
       osc1.type = "sawtooth";
       osc2.type = "sawtooth";
 
-      // Classic high-energy soccer air horn pitches (A4 & detuned sweep)
       osc1.frequency.setValueAtTime(440, now + time);
       osc2.frequency.setValueAtTime(443, now + time);
 
-      // Fast flutter vibrato generator to synthesize physical air tube wobble
       const lfo = ctx.createOscillator();
       const lfoGain = ctx.createGain();
-      lfo.frequency.value = 17; // 17Hz wobbly flutter
-      lfoGain.gain.value = 9;   // flutter depth
+      lfo.frequency.value = 17; 
+      lfoGain.gain.value = 9;   
 
       lfo.connect(lfoGain);
       lfoGain.connect(osc1.frequency);
       lfoGain.connect(osc2.frequency);
 
-      // Narrow stadium horn resonance filter
       bandpass.type = "bandpass";
       bandpass.frequency.setValueAtTime(580, now + time);
       bandpass.Q.setValueAtTime(1.2, now + time);
 
       hornGain.gain.setValueAtTime(0, now + time);
-      hornGain.gain.linearRampToValueAtTime(0.35, now + time + 0.02); // quick punch
+      hornGain.gain.linearRampToValueAtTime(0.35, now + time + 0.02); 
       hornGain.gain.setValueAtTime(0.35, now + time + duration - 0.04);
       hornGain.gain.exponentialRampToValueAtTime(0.001, now + time + duration);
 
@@ -234,23 +246,23 @@ export function playExplosionSound() {
       osc2.stop(now + time + duration);
     };
 
-    // Synthesize 3 rhythmic air horn alerts celebrating the superstar goal
-    playAirHorn(0.12, 0.16); // Ba!
-    playAirHorn(0.34, 0.16); // Ba!
-    playAirHorn(0.56, 0.85); // Baaaa!
+    playAirHorn(0.12, 0.16); 
+    playAirHorn(0.34, 0.16); 
+    playAirHorn(0.56, 0.85); 
     
   } catch (error) {
-    console.warn("Failed to synthesize explosive pyro sound:", error);
+    console.warn("Failed to play explosion sound:", error);
   }
 }
 
 // 4. Synthesize a chest-thumping powerful boot-to-ball kick impact (Thud + Woosh)
 export function playKickSound() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
-    // A. Bass Thud Sweep
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
     osc.type = "triangle";
@@ -265,7 +277,6 @@ export function playKickSound() {
     osc.start(now);
     osc.stop(now + 0.16);
 
-    // B. High-speed Wind Woosh (Friction impact)
     const bufferSize = ctx.sampleRate * 0.08;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -297,8 +308,10 @@ export function playKickSound() {
 
 // 5. Synthesize a time-dilation slow motion resonant whoosh drone
 export function playSlowMoSound() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
     const osc = ctx.createOscillator();
@@ -307,16 +320,16 @@ export function playSlowMoSound() {
 
     osc.type = "sine";
     osc.frequency.setValueAtTime(95, now);
-    osc.frequency.linearRampToValueAtTime(45, now + 0.75); // Slow vibration
+    osc.frequency.linearRampToValueAtTime(45, now + 0.75); 
 
     filter.type = "lowpass";
     filter.frequency.setValueAtTime(750, now);
-    filter.frequency.exponentialRampToValueAtTime(65, now + 0.75); // Resonant closing filter
+    filter.frequency.exponentialRampToValueAtTime(65, now + 0.75); 
     filter.Q.setValueAtTime(4.5, now); 
 
     gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.7, now + 0.25); // Fade in whoosh
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75); // Clean decay
+    gain.gain.linearRampToValueAtTime(0.7, now + 0.25); 
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75); 
 
     osc.connect(filter);
     filter.connect(gain);
@@ -325,17 +338,18 @@ export function playSlowMoSound() {
     osc.start(now);
     osc.stop(now + 0.75);
   } catch (error) {
-    console.warn("Failed to play slow motion drone:", error);
+    console.warn("Failed to play slowmo sound:", error);
   }
 }
 
 // 6. Synthesize high-frequency electric lightning discharge bolts (Zap + Crackle + Rumble)
 export function playLightningZap() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
-    // A. Crackle discharge bursts
     const playCrackle = (time, duration, volume) => {
       const bufferSize = ctx.sampleRate * duration;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -361,19 +375,17 @@ export function playLightningZap() {
       noise.stop(now + time + duration);
     };
 
-    // Sequential static lightning sparks
     playCrackle(0.0, 0.16, 0.5);
     playCrackle(0.08, 0.08, 0.4);
     playCrackle(0.18, 0.28, 0.6);
 
-    // B. Electric Buzzing Sawtooth Wave
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     const filter = ctx.createBiquadFilter();
     
     osc.type = "sawtooth";
     osc.frequency.setValueAtTime(62, now);
-    osc.frequency.linearRampToValueAtTime(105, now + 0.4); // Spark sweep
+    osc.frequency.linearRampToValueAtTime(105, now + 0.4); 
 
     filter.type = "bandpass";
     filter.frequency.setValueAtTime(420, now);
@@ -390,7 +402,7 @@ export function playLightningZap() {
     osc.start(now);
     osc.stop(now + 0.4);
   } catch (error) {
-    console.warn("Failed to play lightning discharge zap:", error);
+    console.warn("Failed to play lightning zap:", error);
   }
 }
 
@@ -398,15 +410,15 @@ export function playLightningZap() {
 let activePackLoop = null;
 
 export function startPackOpeningLoop() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
-    // Stop any existing loop first
     stopPackOpeningLoop();
 
-    // A. Looping Stadium crowd murmur & roar
-    const bufferSize = ctx.sampleRate * 2.5; // 2.5s loop buffer
+    const bufferSize = ctx.sampleRate * 2.5; 
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
@@ -424,14 +436,13 @@ export function startPackOpeningLoop() {
 
     const noiseGain = ctx.createGain();
     noiseGain.gain.setValueAtTime(0.001, now);
-    noiseGain.gain.linearRampToValueAtTime(0.38, now + 1.2); // Smooth fade in
+    noiseGain.gain.linearRampToValueAtTime(0.38, now + 1.2); 
 
     noiseSource.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
     noiseGain.connect(ctx.destination);
     noiseSource.start(now);
 
-    // B. Cosmic Pedestal Deep Sub-Bass Hum (G1 - 49Hz resonance)
     const humOsc = ctx.createOscillator();
     const humGain = ctx.createGain();
     humOsc.type = "triangle";
@@ -452,7 +463,6 @@ export function startPackOpeningLoop() {
       ctx,
       stop: () => {
         const stopNow = ctx.currentTime;
-        // Smooth 0.6s fadeout
         noiseGain.gain.setValueAtTime(noiseGain.gain.value, stopNow);
         noiseGain.gain.exponentialRampToValueAtTime(0.001, stopNow + 0.6);
         
@@ -481,11 +491,12 @@ export function stopPackOpeningLoop() {
 
 // 8. Synthesize massive transition fanfare celebration (Confetti Chime + Whistle + Applause Swell)
 export function playTransitionCelebration() {
+  if (muted) return;
   try {
     const ctx = initAudio();
+    if (!ctx) return;
     const now = ctx.currentTime;
 
-    // A. Triple celebratory referee whistle blast!
     const playBlast = (startTime, duration, pitch) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -508,7 +519,6 @@ export function playTransitionCelebration() {
     playBlast(now + 0.16, 0.12, 980);
     playBlast(now + 0.32, 0.38, 1010);
 
-    // B. High-energy Success Fanfare Chime (C5 -> E5 -> G5 -> C6 Arpeggio)
     const playChime = (startTime, freq) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -530,7 +540,6 @@ export function playTransitionCelebration() {
     playChime(now + 0.32, 783.99); // G5
     playChime(now + 0.44, 1046.50); // C6
 
-    // C. Energetic Crowd Applause Swell
     const bufferSize = ctx.sampleRate * 2.5;
     const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -547,7 +556,7 @@ export function playTransitionCelebration() {
 
     const gainNode = ctx.createGain();
     gainNode.gain.setValueAtTime(0.001, now);
-    gainNode.gain.linearRampToValueAtTime(0.68, now + 0.25); // Fast ecstatic rise
+    gainNode.gain.linearRampToValueAtTime(0.68, now + 0.25); 
     gainNode.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
 
     noise.connect(filter);
@@ -559,4 +568,125 @@ export function playTransitionCelebration() {
   } catch (error) {
     console.warn("Failed to play transition celebration:", error);
   }
+}
+
+// 9. Synthesize futuristic high-pitch UI beep
+export function playBeepSound() {
+  if (muted) return;
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1400, now);
+    osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.08);
+  } catch (e) {
+    console.warn(e);
+  }
+}
+
+// 10. Synthesize a subtle whoosh/hover sweep
+export function playHoverSound() {
+  if (muted) return;
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(450, now + 0.12);
+
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(800, now);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.12);
+  } catch (e) {}
+}
+
+// 11. Synthesize heavy sub-bass kick count beat
+export function playBassKick() {
+  if (muted) return;
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(90, now);
+    osc.frequency.exponentialRampToValueAtTime(25, now + 0.25);
+
+    gain.gain.setValueAtTime(0.8, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.25);
+  } catch (e) {}
+}
+
+// 12. Countdown Sound (Beep chime + Bass impact)
+export function playCountdownSound(num) {
+  if (muted) return;
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    // Bass thud
+    const subOsc = ctx.createOscillator();
+    const subGain = ctx.createGain();
+    subOsc.type = "sine";
+    subOsc.frequency.setValueAtTime(80, now);
+    subOsc.frequency.linearRampToValueAtTime(20, now + 0.3);
+    subGain.gain.setValueAtTime(0.7, now);
+    subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    subOsc.connect(subGain);
+    subGain.connect(ctx.destination);
+    subOsc.start(now);
+    subOsc.stop(now + 0.3);
+
+    // High warning chime
+    const chime = ctx.createOscillator();
+    const chimeGain = ctx.createGain();
+    chime.type = "sine";
+    chime.frequency.setValueAtTime(num === 1 ? 1600 : 880, now);
+    chimeGain.gain.setValueAtTime(0.2, now);
+    chimeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    chime.connect(chimeGain);
+    chimeGain.connect(ctx.destination);
+    chime.start(now);
+    chime.stop(now + 0.25);
+
+  } catch (e) {}
 }

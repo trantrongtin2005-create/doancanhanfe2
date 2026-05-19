@@ -34,8 +34,9 @@ export default function GoalExplosion({ goalX, goalY }) {
         this.vy = Math.sin(angle) * speed;
         this.gravity = 0.15;
         this.drag = 0.98;
-        // Lime and gold colors
-        this.color = Math.random() > 0.5 ? "#ccff00" : "#d1a850";
+        // AAA cyber colors
+        const colors = ["#00f5ff", "#ffd700", "#7b2fff", "#ff006e", "#ffffff"];
+        this.color = colors[Math.floor(Math.random() * colors.length)];
         this.alpha = 1;
         this.fade = Math.random() * 0.015 + 0.01;
       }
