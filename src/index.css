@@ -1,31 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Krona+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700;800&display=swap');
 
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Rajdhani', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --font-display: 'Krona One', sans-serif;
+  --font-display: 'Orbitron', 'Krona One', sans-serif;
+  
+  --font-orbitron: 'Orbitron', sans-serif;
+  --font-rajdhani: 'Rajdhani', sans-serif;
 
   --color-neon-cyan: #00f5ff;
-  --color-neon-purple: #bd00ff;
-  --color-neon-pink: #ff007f;
+  --color-neon-purple: #7b2fff;
+  --color-neon-pink: #ff006e;
+  --color-neon-gold: #ffd700;
   
   --color-fc-lime: #ccff00;
-  --color-fc-gold: #d1a850;
-  --color-fc-dark: #090a0f;
-  --color-fc-card: rgba(18, 20, 28, 0.8);
-  --color-fc-border: rgba(204, 255, 0, 0.15);
+  --color-fc-gold: #ffd700;
+  --color-fc-dark: #0a0a0f;
+  --color-fc-card: rgba(10, 10, 15, 0.7);
+  --color-fc-border: rgba(0, 245, 255, 0.15);
 }
 
-/* Global Reset and EA Sports FC Theme styling */
+/* Global Reset and AAA Next-Gen Esports Theme styling */
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
 }
 
 body {
-  background-color: #090a0f;
+  background-color: #0a0a0f;
   color: #e2e8f0;
   font-family: var(--font-sans);
   overflow-x: hidden;
@@ -33,102 +37,360 @@ body {
   padding: 0;
 }
 
-/* Scrollbar styles */
+/* Custom Premium Neon Scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090a0f;
+  background: #0a0a0f;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(204, 255, 0, 0.15);
-  border-radius: 4px;
+  background: rgba(0, 245, 255, 0.15);
+  border-radius: 3px;
+  border: 1px solid rgba(123, 47, 255, 0.1);
+  transition: all 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-fc-lime);
-  box-shadow: 0 0 10px var(--color-fc-lime);
+  background: linear-gradient(180deg, #00f5ff, #7b2fff);
+  box-shadow: 0 0 10px #00f5ff, 0 0 20px #7b2fff;
 }
 
-/* Sports Carbon Grids and Slanted EA FC Themes */
-.fc-grid-bg {
-  background-color: #090a0f;
+/* 🌌 Living Starfield & Parallax Background System */
+.aaa-space-bg {
+  background: radial-gradient(circle at 50% 50%, #1a0533 0%, #0a0a0f 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.aaa-starfield {
+  position: absolute;
+  inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-  background-size: 20px 20px;
+    radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 40px 70px, rgba(0,245,255,0.8), rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 90px 150px, rgba(255,215,0,0.9), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 150px 240px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 220px 70px, rgba(255,0,110,0.8), rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 280px 120px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 320px 320px;
+  opacity: 0.22;
+  animation: starfieldShift 80s linear infinite;
+  pointer-events: none;
 }
 
-.fc-slanted-bg {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(204, 255, 0, 0.02) 0px,
-    rgba(204, 255, 0, 0.02) 2px,
-    transparent 2px,
-    transparent 15px
+.aaa-starfield-fast {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(1px 1px at 10px 10px, #fff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 150px 150px, rgba(0,245,255,0.7), rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 280px 280px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: 0.15;
+  animation: starfieldShift 40s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes starfieldShift {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 500px; }
+}
+
+/* 🌊 Animated Aurora Waves Overlay */
+.aaa-aurora {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 30%, rgba(123, 47, 255, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 70%, rgba(255, 0, 110, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 50% 10%, rgba(0, 245, 255, 0.05) 0%, transparent 40%);
+  filter: blur(40px);
+  animation: auroraPulse 15s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes auroraPulse {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.7; }
+  50% { transform: scale(1.15) translate(2%, 3%); opacity: 0.9; }
+  100% { transform: scale(1.05) translate(-1%, -2%); opacity: 0.8; }
+}
+
+/* 📺 Subtle Scanline & Telemetry Overlays */
+.aaa-scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
   );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 2;
 }
 
+/* Vignette Shadow Effect */
+.aaa-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(10, 10, 15, 0.8) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Glassmorphism panel styles with inner glow */
 .fc-glass-card {
-  background: rgba(18, 20, 28, 0.85);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(204, 255, 0, 0.12);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  background: rgba(10, 10, 15, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 245, 255, 0.12);
+  box-shadow: inset 0 0 15px rgba(0, 245, 255, 0.03), 
+              0 12px 40px 0 rgba(0, 0, 0, 0.65);
+  position: relative;
 }
 
 .fc-glass-card-hover:hover {
-  border-color: var(--color-fc-lime);
-  box-shadow: 0 0 25px rgba(204, 255, 0, 0.15);
-  background: rgba(22, 24, 34, 0.95);
+  border-color: rgba(0, 245, 255, 0.35);
+  box-shadow: inset 0 0 25px rgba(0, 245, 255, 0.08),
+              0 0 35px rgba(0, 245, 255, 0.15),
+              0 15px 45px 0 rgba(0, 0, 0, 0.8);
+  background: rgba(15, 15, 22, 0.85);
   transform: translateY(-4px);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* EA Sports FC Slanted Title look */
+/* 💫 TRUE HOLOGRAPHIC FOIL SHINE & REFLECTION SYSTEM */
+.holo-shine-layer {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: color-dodge;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(0, 245, 255, 0.8) 30%,
+    rgba(255, 0, 110, 0.8) 45%,
+    rgba(255, 215, 0, 0.8) 60%,
+    rgba(123, 47, 255, 0.8) 75%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  background-position: var(--holo-x, 50%) var(--holo-y, 50%);
+  filter: brightness(1.2) contrast(1.1);
+  transition: opacity 0.3s;
+}
+
+.group:hover .holo-shine-layer {
+  opacity: 0.42;
+}
+
+/* Rainbow edge reflect border glow */
+.holo-border-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2.5px;
+  background: linear-gradient(
+    135deg,
+    #00f5ff,
+    #7b2fff,
+    #ff006e,
+    #ffd700,
+    #00f5ff
+  );
+  background-size: 300% 300%;
+  animation: holoRotateBorder 8s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes holoRotateBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 📐 HUD Corners & Corner Bracket Decorations */
+.hud-corners::before,
+.hud-corners::after,
+.hud-bracket-left,
+.hud-bracket-right {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-corners::before {
+  top: -1px;
+  left: -1px;
+  border-top-color: #00f5ff;
+  border-left-color: #00f5ff;
+}
+
+.hud-corners::after {
+  top: -1px;
+  right: -1px;
+  border-top-color: #00f5ff;
+  border-right-color: #00f5ff;
+}
+
+.hud-bracket-left {
+  bottom: -1px;
+  left: -1px;
+  border-bottom-color: #00f5ff;
+  border-left-color: #00f5ff;
+}
+
+.hud-bracket-right {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-color: #00f5ff;
+  border-right-color: #00f5ff;
+}
+
+/* Esports Slanted Looks & Layered Neon Glow Text Shadows */
 .fc-title-slanted {
   font-family: var(--font-display);
   transform: skewX(-6deg);
-  letter-spacing: -0.05em;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
 }
 
-/* Neon soccer pitch details */
-.soccer-pitch {
-  background: radial-gradient(circle at center, #1b3820 0%, #0d1e10 100%);
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
+.text-glow-cyan {
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.8), 
+               0 0 16px rgba(0, 245, 255, 0.4), 
+               0 0 32px rgba(123, 47, 255, 0.2);
 }
 
-/* Glowing Neon Text and Borders */
-.text-glow-lime {
-  text-shadow: 0 0 10px rgba(204, 255, 0, 0.6), 0 0 20px rgba(204, 255, 0, 0.3);
+.text-glow-gold {
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8), 
+               0 0 16px rgba(255, 215, 0, 0.4), 
+               0 0 32px rgba(255, 0, 110, 0.2);
 }
 
-.border-glow-lime:hover {
-  box-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
-  border-color: var(--color-fc-lime);
+.text-glow-pink {
+  text-shadow: 0 0 8px rgba(255, 0, 110, 0.8), 
+               0 0 16px rgba(255, 0, 110, 0.4);
 }
 
-/* Camera Shake Jitter classes */
-@keyframes shake {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  10% { transform: translate(-3px, 2px) rotate(-1deg); }
-  20% { transform: translate(2px, -3px) rotate(1deg); }
-  30% { transform: translate(-2px, -2px) rotate(0deg); }
-  40% { transform: translate(3px, 2px) rotate(1deg); }
-  50% { transform: translate(-1px, -1px) rotate(-1deg); }
-  60% { transform: translate(-3px, 1px) rotate(0deg); }
-  75% { transform: translate(2px, -2px) rotate(1deg); }
-  90% { transform: translate(-1px, 2px) rotate(0deg); }
+/* Custom buttons hover and sweeps */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
 }
 
-.camera-shake {
-  animation: shake 0.4s ease-in-out;
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+}
+
+.btn-shimmer:hover::after {
+  animation: shimmerSweep 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmerSweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* 🎛️ sound-reactive style equalizer animation */
+.eq-container {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 20px;
+}
+
+.eq-bar {
+  width: 3px;
+  background: #00f5ff;
+  border-radius: 2px;
+  animation: eqBounce 1.2s ease-in-out infinite alternate;
+}
+
+.eq-bar:nth-child(2) { animation-delay: 0.15s; background: #7b2fff; }
+.eq-bar:nth-child(3) { animation-delay: 0.3s; background: #ffd700; }
+.eq-bar:nth-child(4) { animation-delay: 0.45s; background: #ff006e; }
+.eq-bar:nth-child(5) { animation-delay: 0.6s; background: #00f5ff; }
+
+@keyframes eqBounce {
+  0% { height: 4px; }
+  100% { height: 18px; }
+}
+
+/* Liquid indicator styling */
+.liquid-tab-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #7b2fff, #00f5ff);
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.45);
+  border-radius: 8px;
+  z-index: 0;
+  transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Entrance Flip Animation for Card */
+@keyframes cardEntrance {
+  0% {
+    opacity: 0;
+    transform: perspective(2000px) rotateY(-80deg) scale(0.65) translateZ(-500px);
+    filter: brightness(0.2) blur(10px);
+  }
+  50% {
+    opacity: 0.7;
+    filter: brightness(1.2) blur(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(2000px) rotateY(0deg) scale(1) translateZ(0);
+    filter: brightness(1) blur(0);
+  }
+}
+
+.aaa-card-entrance {
+  animation: cardEntrance 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Breathing glow pulse keyframes */
+@keyframes breathingPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.35));
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(0, 245, 255, 0.75));
+    box-shadow: 0 0 30px rgba(0, 245, 255, 0.35);
+  }
+}
+
+.aaa-breathing-glow {
+  animation: breathingPulse 3.5s infinite ease-in-out;
 }
 
 /* FUT Card Shape Clip Paths */
@@ -138,20 +400,4 @@ body {
 
 .fut-card-inner-clip {
   clip-path: polygon(9% 1%, 91% 1%, 99% 9%, 99% 84%, 84% 99%, 16% 99%, 1% 91%, 1% 9%);
-}
-
-/* Loading animations */
-@keyframes pulseLime {
-  0%, 100% {
-    opacity: 0.4;
-    box-shadow: 0 0 10px rgba(204, 255, 0, 0.2);
-  }
-  50% {
-    opacity: 0.9;
-    box-shadow: 0 0 25px rgba(204, 255, 0, 0.5);
-  }
-}
-
-.lime-glow-pulse {
-  animation: pulseLime 2s infinite ease-in-out;
 }
