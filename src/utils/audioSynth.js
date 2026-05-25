@@ -690,3 +690,108 @@ export function playCountdownSound(num) {
 
   } catch (e) {}
 }
+
+// 13. Futuristic Notification Chime Synthesizer
+export function playNotificationChime(type = "info") {
+  if (muted) return;
+  try {
+    const ctx = initAudio();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    if (type === "success" || type === "achievement") {
+      // 🌟 Sparkly rising arpeggio (C5 -> E5 -> G5 -> C6)
+      const playTone = (freq, delay, duration, vol = 0.15) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + delay);
+        
+        // Add subtle vibrato
+        const vibrato = ctx.createOscillator();
+        const vibratoGain = ctx.createGain();
+        vibrato.frequency.value = 12;
+        vibratoGain.gain.value = freq * 0.01;
+        vibrato.connect(vibratoGain);
+        vibratoGain.connect(osc.frequency);
+        
+        gain.gain.setValueAtTime(0, now + delay);
+        gain.gain.linearRampToValueAtTime(vol, now + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + duration);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        vibrato.start(now + delay);
+        osc.start(now + delay);
+        vibrato.stop(now + delay + duration);
+        osc.stop(now + delay + duration);
+      };
+
+      if (type === "achievement") {
+        // Magical, fast chime sweep
+        playTone(523.25, 0, 0.4);      // C5
+        playTone(659.25, 0.07, 0.4);   // E5
+        playTone(783.99, 0.14, 0.4);   // G5
+        playTone(1046.50, 0.21, 0.6);  // C6
+        playTone(1318.51, 0.28, 0.6, 0.08); // E6
+      } else {
+        // Uplifting success chime
+        playTone(523.25, 0, 0.3);      // C5
+        playTone(659.25, 0.08, 0.3);   // E5
+        playTone(783.99, 0.16, 0.5);   // G5
+      }
+    } else if (type === "warning") {
+      // ⚠️ Alert: two-tone detuned warning beep
+      const playWarningTone = (freq, delay, duration) => {
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc1.type = "triangle";
+        osc2.type = "triangle";
+        osc1.frequency.setValueAtTime(freq, now + delay);
+        osc2.frequency.setValueAtTime(freq + 4, now + delay); // Detuning
+        
+        gain.gain.setValueAtTime(0, now + delay);
+        gain.gain.linearRampToValueAtTime(0.18, now + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + duration);
+        
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc1.start(now + delay);
+        osc2.start(now + delay);
+        osc1.stop(now + delay + duration);
+        osc2.stop(now + delay + duration);
+      };
+      
+      playWarningTone(330, 0, 0.15); // E4
+      playWarningTone(293.66, 0.12, 0.25); // D4
+    } else {
+      // ℹ️ Info: clean dual-tone chime
+      const playInfoTone = (freq, delay, duration) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + delay);
+        
+        gain.gain.setValueAtTime(0, now + delay);
+        gain.gain.linearRampToValueAtTime(0.15, now + delay + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + duration);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start(now + delay);
+        osc.stop(now + delay + duration);
+      };
+
+      playInfoTone(880, 0, 0.15);  // A5
+      playInfoTone(1174.66, 0.08, 0.25); // D6
+    }
+  } catch (e) {
+    console.warn("Failed to play notification chime:", e);
+  }
+}

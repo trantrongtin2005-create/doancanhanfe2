@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiAward, FiUser, FiSliders, FiCalendar, FiTrendingUp, FiSend, FiCheckCircle, FiExternalLink, FiGithub, FiArrowRight } from "react-icons/fi";
+import { FiAward, FiUser, FiSliders, FiCalendar, FiTrendingUp, FiSend, FiCheckCircle, FiExternalLink, FiGithub, FiArrowRight, FiBell, FiVolume2, FiVolumeX, FiSettings, FiActivity } from "react-icons/fi";
 import { profileData } from "../data/profileData";
 import PlayerCard from "../components/PlayerCard";
 import confetti from "canvas-confetti";
-import { playWhistle, playCrowdGoal, playBeepSound, playHoverSound, playTransitionCelebration } from "../utils/audioSynth";
+import { playWhistle, playCrowdGoal, playBeepSound, playHoverSound, playTransitionCelebration, toggleMute, isMuted } from "../utils/audioSynth";
+import { useVibelyNotifications } from "../components/VibelyNotificationProvider";
 
 // High-fidelity count up text with easing for stat count-up
 function CountUp({ end, duration = 800 }) {
@@ -40,6 +41,28 @@ function CountUp({ end, duration = 800 }) {
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("about");
   const contentRef = useRef(null);
+  
+  // Track mute state locally to trigger re-renders
+  const [soundMuted, setSoundMuted] = useState(isMuted());
+  
+  const {
+    notifications,
+    isSimulating,
+    simulationInterval,
+    addNotification,
+    setIsSimulating,
+    setSimulationInterval
+  } = useVibelyNotifications();
+
+  const handleToggleMute = () => {
+    const muted = toggleMute();
+    setSoundMuted(muted);
+    addNotification(
+      muted ? "warning" : "success",
+      muted ? "Đã tắt âm thanh" : "Đã bật âm thanh",
+      muted ? "Hệ thống âm thanh synthesizer đã được tắt tiếng." : "Hệ thống âm thanh synthesizer đã được kích hoạt lại."
+    );
+  };
 
   useEffect(() => {
     // Smooth scroll to content drawer on tab change, especially useful for mobile!
@@ -64,7 +87,8 @@ export default function Dashboard() {
     { id: "attributes", label: "PLAYER STATS // CHỈ SỐ", icon: <FiSliders size={16} /> },
     { id: "trophies", label: "TROPHY CABINET // DỰ ÁN", icon: <FiAward size={16} /> },
     { id: "seasons", label: "CAREER SEASONS // HÀNH TRÌNH", icon: <FiCalendar size={16} /> },
-    { id: "transfer", label: "TRANSFER OFFER // LIÊN HỆ", icon: <FiTrendingUp size={16} /> }
+    { id: "transfer", label: "TRANSFER OFFER // LIÊN HỆ", icon: <FiTrendingUp size={16} /> },
+    { id: "notifications", label: "VIBELY NOTIFICATION // GIẢ LẬP", icon: <FiBell size={16} /> }
   ];
 
   const handleFormChange = (e) => {
@@ -79,11 +103,21 @@ export default function Dashboard() {
       return;
     }
 
+    const senderName = formData.name;
+    const senderSubject = formData.subject || "Lập trình viên";
+
     setFormStatus("sending");
     playBeepSound();
 
     setTimeout(() => {
       setFormStatus("success");
+      
+      // Trigger a success notification in the system
+      addNotification(
+        "success",
+        "Hợp đồng đề xuất đã nhận",
+        `Đối tác ${senderName} đã gửi đề xuất tuyển dụng cho vị trí "${senderSubject}".`
+      );
       
       // Celebrate transfer contract signing!
       playWhistle();
@@ -642,6 +676,181 @@ export default function Dashboard() {
                         </button>
                       </form>
                     )}
+                  </motion.div>
+                )}
+
+                {activeTab === "notifications" && (
+                  <motion.div
+                    key="notifications"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="space-y-6 text-slate-100"
+                  >
+                    <div className="pb-4 border-b border-white/5">
+                      <span className="font-mono text-xs text-[#00f5ff] text-glow-cyan font-bold">VIBELY SIMULATION CONTROL // [STADIUM ENGINE]</span>
+                      <h3 className="fc-title-slanted text-3xl sm:text-4xl font-extrabold text-white mt-1 tracking-wider">
+                        TRẠM ĐIỀU KHIỂN <span className="text-[#ffd700] text-glow-gold">THÔNG BÁO</span>
+                      </h3>
+                    </div>
+
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-sans font-medium">
+                      Nơi thử nghiệm và điều chỉnh hệ thống thông báo Vibely. Bạn có thể bật/tắt cập nhật realtime giả lập, thay đổi tần suất, kiểm tra âm thanh synthesizer và xem các chỉ số phản hồi của luồng render 60fps.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                      {/* Section 1: Real-time update simulator controls */}
+                      <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-4">
+                        <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                          <FiSettings className="text-[#00f5ff] text-glow-cyan" size={16} />
+                          <h4 className="font-display text-xs text-white font-black uppercase tracking-wider">
+                            CẤU HÌNH REALTIME SIMULATOR
+                          </h4>
+                        </div>
+                        
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">
+                            TRẠNG THÁI GIẢ LẬP
+                          </label>
+                          <button
+                            onClick={() => {
+                              playBeepSound();
+                              setIsSimulating(!isSimulating);
+                            }}
+                            onMouseEnter={() => playHoverSound()}
+                            className={`py-3 rounded-xl font-display text-[10px] font-extrabold tracking-widest uppercase transition-all duration-300 cursor-pointer border ${
+                              isSimulating
+                                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
+                                : "bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/15"
+                            }`}
+                          >
+                            {isSimulating ? "● GIẢ LẬP ĐANG HOẠT ĐỘNG" : "○ GIẢ LẬP ĐANG TẮT"}
+                          </button>
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">
+                            TẦN SUẤT CẬP NHẬT: {simulationInterval} GIÂY
+                          </label>
+                          <div className="flex gap-2">
+                            {[5, 10, 20, 30, 60].map((interval) => (
+                              <button
+                                key={interval}
+                                onClick={() => {
+                                  playBeepSound();
+                                  setSimulationInterval(interval);
+                                }}
+                                onMouseEnter={() => playHoverSound()}
+                                className={`flex-1 py-2 rounded-lg font-mono text-xs font-bold transition-all cursor-pointer border ${
+                                  simulationInterval === interval
+                                    ? "bg-[#7b2fff] border-[#00f5ff]/30 text-white shadow-[0_0_10px_rgba(123,47,255,0.3)]"
+                                    : "bg-black/30 border-white/5 text-slate-400 hover:text-white"
+                                }`}
+                              >
+                                {interval}s
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section 2: Audio & System Telemetry */}
+                      <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-4">
+                        <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                          <FiActivity className="text-[#ff006e] text-glow-pink" size={16} />
+                          <h4 className="font-display text-xs text-white font-black uppercase tracking-wider">
+                            HỆ THỐNG ÂM THANH & HIỆU NĂNG
+                          </h4>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">ÂM THANH THÔNG BÁO</span>
+                            <span className="text-xs text-slate-300 font-semibold">{soundMuted ? "Đã tắt tiếng (Muted)" : "Bật chimes lập trình (Synthesizer)"}</span>
+                          </div>
+                          <button
+                            onClick={handleToggleMute}
+                            onMouseEnter={() => playHoverSound()}
+                            className={`p-3 rounded-xl border transition-all duration-300 cursor-pointer ${
+                              soundMuted
+                                ? "bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/15"
+                                : "bg-[#00f5ff]/10 border-[#00f5ff]/30 text-[#00f5ff] text-glow-cyan shadow-[0_0_12px_rgba(0,245,255,0.15)]"
+                            }`}
+                            title={soundMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+                          >
+                            {soundMuted ? <FiVolumeX size={16} /> : <FiVolume2 size={16} />}
+                          </button>
+                        </div>
+
+                        {/* Telemetry info */}
+                        <div className="pt-2 grid grid-cols-2 gap-3 text-[10px] font-mono">
+                          <div className="p-2 rounded bg-black/30 border border-white/5">
+                            <span className="block text-slate-500 font-bold">RENDER THREAD</span>
+                            <span className="text-[#00f5ff] font-bold">60 FPS TARGET</span>
+                          </div>
+                          <div className="p-2 rounded bg-black/30 border border-white/5">
+                            <span className="block text-slate-500 font-bold">GPU ANIMATION</span>
+                            <span className="text-[#ffd700] font-bold">TRANSFORM ON</span>
+                          </div>
+                          <div className="p-2 rounded bg-black/30 border border-white/5">
+                            <span className="block text-slate-500 font-bold">LAZY RENDERS</span>
+                            <span className="text-[#ff006e] font-bold">LIMIT 8 ITEMS</span>
+                          </div>
+                          <div className="p-2 rounded bg-black/30 border border-white/5">
+                            <span className="block text-slate-500 font-bold">TOTAL LOGS</span>
+                            <span className="text-white font-bold">{notifications.length} ITEMS</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Section 3: Instant test buttons grid */}
+                    <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-4">
+                      <h4 className="font-display text-xs text-white font-black uppercase tracking-wider pb-2 border-b border-white/5">
+                        KÍCH HOẠT THỬ NGHIỆM THÔNG BÁO TỨC THÌ
+                      </h4>
+                      
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button
+                          onClick={() => {
+                            addNotification("info", "Kiểm tra thông tin", "Đây là thông báo kiểm tra hệ thống thông tin Vibely.");
+                          }}
+                          onMouseEnter={() => playHoverSound()}
+                          className="py-3 px-2 rounded-xl bg-[#00f5ff]/10 hover:bg-[#00f5ff]/20 border border-[#00f5ff]/30 text-xs font-mono font-bold text-[#00f5ff] text-glow-cyan transition-all duration-300 cursor-pointer text-center"
+                        >
+                          GỬI TEST INFO
+                        </button>
+                        <button
+                          onClick={() => {
+                            addNotification("success", "Đề xuất phỏng vấn", "Hãng tin VTV đã gửi lời mời tham dự talkshow công nghệ.");
+                          }}
+                          onMouseEnter={() => playHoverSound()}
+                          className="py-3 px-2 rounded-xl bg-[#ffd700]/10 hover:bg-[#ffd700]/20 border border-[#ffd700]/30 text-xs font-mono font-bold text-[#ffd700] text-glow-gold transition-all duration-300 cursor-pointer text-center"
+                        >
+                          GỬI TEST SUCCESS
+                        </button>
+                        <button
+                          onClick={() => {
+                            addNotification("achievement", "Mở khóa thành tích", "Chỉ số cản phá bóng phạt đền của thủ môn tăng lên 99.");
+                          }}
+                          onMouseEnter={() => playHoverSound()}
+                          className="py-3 px-2 rounded-xl bg-[#ff006e]/10 hover:bg-[#ff006e]/20 border border-[#ff006e]/30 text-xs font-mono font-bold text-[#ff006e] text-glow-pink transition-all duration-300 cursor-pointer text-center"
+                        >
+                          GỬI ACHIEVEMENT
+                        </button>
+                        <button
+                          onClick={() => {
+                            addNotification("warning", "Bộ nhớ quá tải", "API response time vượt mức 150ms. Đang tự động xử lý...");
+                          }}
+                          onMouseEnter={() => playHoverSound()}
+                          className="py-3 px-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-mono font-bold text-amber-400 transition-all duration-300 cursor-pointer text-center"
+                        >
+                          GỬI TEST WARNING
+                        </button>
+                      </div>
+                    </div>
+
                   </motion.div>
                 )}
               </AnimatePresence>

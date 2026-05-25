@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiPlay, FiSkipForward, FiGithub, FiFacebook, FiMail, FiHeart } from "react-icons/fi";
+import { FiPlay, FiSkipForward, FiGithub, FiFacebook, FiMail, FiHeart, FiBell } from "react-icons/fi";
 import FootballGame from "./components/FootballGame";
 import Dashboard from "./pages/Dashboard";
 import { playWhistle, playBeepSound, playHoverSound } from "./utils/audioSynth";
 import { profileData } from "./data/profileData";
+import { useVibelyNotifications } from "./components/VibelyNotificationProvider";
+import NotificationToastContainer from "./components/NotificationToastContainer";
+import NotificationCenter from "./components/NotificationCenter";
 
 function App() {
   const [screen, setScreen] = useState("game"); 
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
   const currentYear = new Date().getFullYear();
+  const { notifications } = useVibelyNotifications();
+  
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleGoalScored = () => {
     setTimeout(() => {
@@ -55,6 +62,33 @@ function App() {
 
           {/* Quick Info & Skip controls */}
           <div className="flex items-center gap-4">
+            {/* Notification Bell Button */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  playBeepSound();
+                  setIsNotifOpen(!isNotifOpen);
+                }}
+                onMouseEnter={() => playHoverSound()}
+                className={`p-2.5 rounded-full border bg-[#0a0a0f]/60 hover:bg-white/5 transition-all duration-300 relative cursor-pointer ${
+                  unreadCount > 0 
+                    ? "border-[#00f5ff]/45 text-[#00f5ff] text-glow-cyan shadow-[0_0_12px_rgba(0,245,255,0.25)]" 
+                    : "border-white/10 text-slate-400 hover:text-white"
+                }`}
+                aria-label="Mở hộp thông báo"
+              >
+                <FiBell size={16} className={unreadCount > 0 ? "animate-pulse" : ""} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ff006e] text-[8px] font-mono font-black flex items-center justify-center text-white border border-[#0a0a0f] shadow-[0_0_5px_#ff006e]">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              
+              {/* Notification Center Dropdown */}
+              <NotificationCenter isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
+            </div>
+
             {screen === "game" ? (
               <button
                 onClick={handleSkipGame}
@@ -171,6 +205,9 @@ function App() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Active Toasts Portal */}
+      <NotificationToastContainer />
 
     </div>
   );
